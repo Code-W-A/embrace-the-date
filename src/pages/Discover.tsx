@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { Heart, X, Filter, MapPin } from 'lucide-react';
-import Navigation from '../components/Navigation';
+import Layout from '../components/Layout';
 
 const Discover = () => {
   const profiles = [
@@ -34,10 +33,8 @@ const Discover = () => {
   const [currentProfile, setCurrentProfile] = React.useState(0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">
-      <Navigation />
-      
-      <div className="pt-24 px-4 pb-8">
+    <Layout>
+      <div className="px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-3xl font-bold text-gray-800">Discover</h1>
@@ -127,7 +124,7 @@ const Discover = () => {
           </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 

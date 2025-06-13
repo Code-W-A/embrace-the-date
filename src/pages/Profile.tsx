@@ -1,4 +1,4 @@
-
+import Layout from '../components/Layout';
 import { User, Camera, Heart, MessageCircle, MapPin, Calendar } from 'lucide-react';
 import Navigation from '../components/Navigation';
 
@@ -17,10 +17,8 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">
-      <Navigation />
-      
-      <div className="pt-24 px-4 pb-8">
+    <Layout>
+      <div className="px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Profile Header */}
           <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
@@ -124,7 +122,7 @@ const Profile = () => {
           </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 

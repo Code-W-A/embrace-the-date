@@ -1,5 +1,5 @@
-
 import { Search, MoreVertical, Send, Heart } from 'lucide-react';
+import Layout from '../components/Layout';
 import Navigation from '../components/Navigation';
 
 const Messages = () => {
@@ -40,10 +40,8 @@ const Messages = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">
-      <Navigation />
-      
-      <div className="pt-20 px-4 pb-8">
+    <Layout>
+      <div className="px-4 py-8">
         <div className="max-w-6xl mx-auto h-[calc(100vh-7rem)]">
           <div className="bg-white rounded-2xl shadow-lg overflow-hidden h-full flex">
             {/* Conversations List */}
@@ -152,7 +150,7 @@ const Messages = () => {
           </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 
