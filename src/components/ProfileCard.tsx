@@ -1,15 +1,24 @@
 
 import { Heart, MessageCircle, User } from 'lucide-react';
 
-interface ProfileCardProps {
+interface Profile {
+  id: number;
   name: string;
   age: number;
+  location: string;
   bio: string;
+  photos: string[];
   interests: string[];
-  imageUrl?: string;
 }
 
-const ProfileCard = ({ name, age, bio, interests, imageUrl }: ProfileCardProps) => {
+interface ProfileCardProps {
+  profile: Profile;
+}
+
+const ProfileCard = ({ profile }: ProfileCardProps) => {
+  const { name, age, bio, interests = [], photos } = profile;
+  const imageUrl = photos && photos.length > 0 ? photos[0] : undefined;
+
   return (
     <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group">
       <div className="relative h-64 bg-gradient-to-br from-pink-200 to-purple-200">
