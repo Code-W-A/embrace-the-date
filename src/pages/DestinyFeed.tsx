@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import Layout from "../components/Layout";
 import DestinyPostCard from "../components/DestinyPostCard";
 import DestinyPostModal from "../components/DestinyPostModal";
 import { DestinyPost, DestinyProfileUser } from "../types/destiny";
@@ -134,90 +135,92 @@ export default function DestinyFeed() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50">
-      <div className="max-w-2xl mx-auto py-8 px-4">
-        {/* Header cu gradient și animație */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-extrabold mb-2 bg-gradient-to-r from-purple-600 via-pink-500 to-indigo-600 text-transparent bg-clip-text animate-fade-in">
-            ✨ Calea Destinului ✨
-          </h1>
-          <p className="text-gray-600 font-medium">Împărtășește-ți energia cu universul</p>
-        </div>
+    <Layout>
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50">
+        <div className="max-w-2xl mx-auto py-8 px-4">
+          {/* Header cu gradient și animație */}
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-extrabold mb-2 bg-gradient-to-r from-purple-600 via-pink-500 to-indigo-600 text-transparent bg-clip-text animate-fade-in">
+              ✨ Calea Destinului ✨
+            </h1>
+            <p className="text-gray-600 font-medium">Împărtășește-ți energia cu universul</p>
+          </div>
 
-        {/* Card pentru crearea postării cu design îmbunătățit */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-6 mb-8 hover:shadow-2xl transition-all duration-300">
-          <div className="flex items-center mb-4">
-            <img 
-              src={currentUser.avatar} 
-              alt={currentUser.name} 
-              className="w-12 h-12 rounded-full mr-4 border-2 border-purple-200 shadow-md object-cover" 
+          {/* Card pentru crearea postării cu design îmbunătățit */}
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-6 mb-8 hover:shadow-2xl transition-all duration-300">
+            <div className="flex items-center mb-4">
+              <img 
+                src={currentUser.avatar} 
+                alt={currentUser.name} 
+                className="w-12 h-12 rounded-full mr-4 border-2 border-purple-200 shadow-md object-cover" 
+              />
+              <div>
+                <div className="font-semibold text-gray-800">{currentUser.name}</div>
+                <div className="text-sm text-purple-600 font-medium">{currentUser.zodiac}</div>
+              </div>
+            </div>
+            
+            <div className="mb-4 p-3 bg-gradient-to-r from-purple-100 to-pink-100 rounded-xl border-l-4 border-purple-400">
+              <div className="flex items-center text-sm text-gray-600 mb-1">
+                <Sparkles className="w-4 h-4 mr-2 text-purple-500" />
+                <span className="font-medium">Inspirație cosmică:</span>
+              </div>
+              <div className="text-purple-700 font-medium">{prompt}</div>
+            </div>
+            
+            <textarea
+              className="w-full rounded-2xl border-2 border-purple-200 p-4 focus:ring-2 focus:ring-purple-400 focus:border-transparent resize-none bg-white/50 backdrop-blur-sm transition-all duration-200"
+              rows={3}
+              placeholder="Scrie ceva frumos pentru universul tău..."
+              value={content}
+              onChange={e => setContent(e.target.value)}
             />
-            <div>
-              <div className="font-semibold text-gray-800">{currentUser.name}</div>
-              <div className="text-sm text-purple-600 font-medium">{currentUser.zodiac}</div>
+            
+            <div className="flex justify-between items-center mt-4">
+              <Button 
+                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105" 
+                onClick={handleCreatePost} 
+                disabled={!content.trim()}
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Postează
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-full"
+                onClick={() => setPrompt(PROMPTS[Math.floor(Math.random() * PROMPTS.length)])}
+              >
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Altă inspirație
+              </Button>
             </div>
           </div>
-          
-          <div className="mb-4 p-3 bg-gradient-to-r from-purple-100 to-pink-100 rounded-xl border-l-4 border-purple-400">
-            <div className="flex items-center text-sm text-gray-600 mb-1">
-              <Sparkles className="w-4 h-4 mr-2 text-purple-500" />
-              <span className="font-medium">Inspirație cosmică:</span>
-            </div>
-            <div className="text-purple-700 font-medium">{prompt}</div>
+
+          {/* Lista de postări */}
+          <div className="space-y-6">
+            {posts.map((post) => (
+              <DestinyPostCard 
+                key={post.id} 
+                post={post} 
+                onReact={(t) => handleReactToPost(post.id, t)}
+                onPostClick={() => handlePostClick(post)}
+              />
+            ))}
           </div>
-          
-          <textarea
-            className="w-full rounded-2xl border-2 border-purple-200 p-4 focus:ring-2 focus:ring-purple-400 focus:border-transparent resize-none bg-white/50 backdrop-blur-sm transition-all duration-200"
-            rows={3}
-            placeholder="Scrie ceva frumos pentru universul tău..."
-            value={content}
-            onChange={e => setContent(e.target.value)}
+
+          {/* Modal pentru detaliile postării */}
+          <DestinyPostModal
+            post={selectedPost}
+            open={modalOpen}
+            onClose={() => {
+              setModalOpen(false);
+              setSelectedPost(null);
+            }}
+            onReact={handleModalReact}
           />
-          
-          <div className="flex justify-between items-center mt-4">
-            <Button 
-              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105" 
-              onClick={handleCreatePost} 
-              disabled={!content.trim()}
-            >
-              <Sparkles className="w-4 h-4 mr-2" />
-              Postează
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-full"
-              onClick={() => setPrompt(PROMPTS[Math.floor(Math.random() * PROMPTS.length)])}
-            >
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Altă inspirație
-            </Button>
-          </div>
         </div>
-
-        {/* Lista de postări */}
-        <div className="space-y-6">
-          {posts.map((post) => (
-            <DestinyPostCard 
-              key={post.id} 
-              post={post} 
-              onReact={(t) => handleReactToPost(post.id, t)}
-              onPostClick={() => handlePostClick(post)}
-            />
-          ))}
-        </div>
-
-        {/* Modal pentru detaliile postării */}
-        <DestinyPostModal
-          post={selectedPost}
-          open={modalOpen}
-          onClose={() => {
-            setModalOpen(false);
-            setSelectedPost(null);
-          }}
-          onReact={handleModalReact}
-        />
       </div>
-    </div>
+    </Layout>
   );
 }
