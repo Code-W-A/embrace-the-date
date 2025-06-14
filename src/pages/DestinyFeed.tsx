@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import DestinyPostCard from "../components/DestinyPostCard";
+import DestinyPostModal from "../components/DestinyPostModal";
 import { DestinyPost, DestinyProfileUser } from "../types/destiny";
 import { Button } from "../components/ui/button";
 import { Sparkles, RefreshCw } from "lucide-react";
@@ -68,6 +69,8 @@ export default function DestinyFeed() {
   const [prompt, setPrompt] = useState(PROMPTS[Math.floor(Math.random() * PROMPTS.length)]);
   const [content, setContent] = useState("");
   const [creating, setCreating] = useState(false);
+  const [selectedPost, setSelectedPost] = useState<DestinyPost | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const currentUser = dummyUsers[0];
 
@@ -108,6 +111,27 @@ export default function DestinyFeed() {
       )
     );
   }
+
+  const handlePostClick = (post: DestinyPost) => {
+    setSelectedPost(post);
+    setModalOpen(true);
+  };
+
+  const handleModalReact = (type: "star" | "sun" | "moon") => {
+    if (selectedPost) {
+      handleReactToPost(selectedPost.id, type);
+      // Update the selected post with new reaction count
+      setSelectedPost(prev => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          reactions: prev.reactions.map(r =>
+            r.type === type ? { ...r, count: r.count + 1 } : r
+          )
+        };
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50">
@@ -174,9 +198,25 @@ export default function DestinyFeed() {
         {/* Lista de postări */}
         <div className="space-y-6">
           {posts.map((post) => (
-            <DestinyPostCard key={post.id} post={post} onReact={(t) => handleReactToPost(post.id, t)} />
+            <DestinyPostCard 
+              key={post.id} 
+              post={post} 
+              onReact={(t) => handleReactToPost(post.id, t)}
+              onPostClick={() => handlePostClick(post)}
+            />
           ))}
         </div>
+
+        {/* Modal pentru detaliile postării */}
+        <DestinyPostModal
+          post={selectedPost}
+          open={modalOpen}
+          onClose={() => {
+            setModalOpen(false);
+            setSelectedPost(null);
+          }}
+          onReact={handleModalReact}
+        />
       </div>
     </div>
   );

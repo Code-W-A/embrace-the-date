@@ -8,9 +8,10 @@ import { Card } from "./ui/card";
 interface DestinyPostCardProps {
   post: DestinyPost;
   onReact?: (type: "star" | "sun" | "moon") => void;
+  onPostClick?: () => void;
 }
 
-export default function DestinyPostCard({ post, onReact }: DestinyPostCardProps) {
+export default function DestinyPostCard({ post, onReact, onPostClick }: DestinyPostCardProps) {
   const navigate = useNavigate();
 
   const formatDate = (dateString: string) => {
@@ -23,14 +24,30 @@ export default function DestinyPostCard({ post, onReact }: DestinyPostCardProps)
     return `${Math.floor(diffInHours / 24)}z`;
   };
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Prevent opening modal when clicking on interactive elements
+    if ((e.target as HTMLElement).closest('button')) {
+      return;
+    }
+    onPostClick?.();
+  };
+
+  const handleProfileClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/destiny-profile/${post.author.id}`);
+  };
+
   return (
-    <Card className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] relative overflow-hidden">
+    <Card 
+      className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] relative overflow-hidden cursor-pointer"
+      onClick={handleCardClick}
+    >
       {/* Gradient de fundal subtil */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-50/30 to-pink-50/30 rounded-3xl"></div>
       
       <div className="relative z-10">
         {/* Header cu avatar și info */}
-        <div className="flex items-center mb-4 cursor-pointer group" onClick={() => navigate(`/destiny-profile/${post.author.id}`)}>
+        <div className="flex items-center mb-4 cursor-pointer group" onClick={handleProfileClick}>
           <div className="relative">
             <img 
               src={post.author.avatar} 
@@ -78,7 +95,10 @@ export default function DestinyPostCard({ post, onReact }: DestinyPostCardProps)
               variant="ghost"
               size="sm"
               className="flex items-center gap-2 hover:bg-yellow-50 hover:text-yellow-600 rounded-full px-3 py-2 transition-all duration-200"
-              onClick={() => onReact?.("star")}
+              onClick={(e) => {
+                e.stopPropagation();
+                onReact?.("star");
+              }}
             >
               <Star className="w-5 h-5 text-yellow-500 fill-current" />
               <span className="text-sm font-medium">{post.reactions.find(x => x.type === "star")?.count ?? 0}</span>
@@ -88,7 +108,10 @@ export default function DestinyPostCard({ post, onReact }: DestinyPostCardProps)
               variant="ghost"
               size="sm"
               className="flex items-center gap-2 hover:bg-orange-50 hover:text-orange-600 rounded-full px-3 py-2 transition-all duration-200"
-              onClick={() => onReact?.("sun")}
+              onClick={(e) => {
+                e.stopPropagation();
+                onReact?.("sun");
+              }}
             >
               <Sun className="w-5 h-5 text-orange-500 fill-current" />
               <span className="text-sm font-medium">{post.reactions.find(x => x.type === "sun")?.count ?? 0}</span>
@@ -98,7 +121,10 @@ export default function DestinyPostCard({ post, onReact }: DestinyPostCardProps)
               variant="ghost"
               size="sm"
               className="flex items-center gap-2 hover:bg-blue-50 hover:text-blue-600 rounded-full px-3 py-2 transition-all duration-200"
-              onClick={() => onReact?.("moon")}
+              onClick={(e) => {
+                e.stopPropagation();
+                onReact?.("moon");
+              }}
             >
               <Moon className="w-5 h-5 text-blue-500 fill-current" />
               <span className="text-sm font-medium">{post.reactions.find(x => x.type === "moon")?.count ?? 0}</span>
@@ -110,6 +136,7 @@ export default function DestinyPostCard({ post, onReact }: DestinyPostCardProps)
               variant="ghost" 
               size="sm" 
               className="text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-full p-2 transition-all duration-200"
+              onClick={(e) => e.stopPropagation()}
             >
               <Share2 className="w-5 h-5" />
             </Button>
