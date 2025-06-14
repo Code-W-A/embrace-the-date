@@ -13,6 +13,12 @@ const BottomNavigation = () => {
       activeColor: 'text-pink-500'
     },
     {
+      path: '/destiny-feed',
+      icon: Compass,
+      label: 'Calea Destinului',
+      activeColor: 'text-violet-600'
+    },
+    {
       path: '/discover',
       icon: Compass,
       label: 'Discover',
