@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,6 +11,8 @@ import Discover from "./pages/Discover";
 import AstrologyQuiz from "./pages/AstrologyQuiz";
 import CompatibilityResults from "./pages/CompatibilityResults";
 import NotFound from "./pages/NotFound";
+import DestinyFeed from "./pages/DestinyFeed";
+import DestinyProfile from "./pages/DestinyProfile";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +24,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/destiny-feed" element={<DestinyFeed />} />
+          <Route path="/destiny-profile/:userId" element={<DestinyProfile />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/messages" element={<Messages />} />
           <Route path="/discover" element={<Discover />} />

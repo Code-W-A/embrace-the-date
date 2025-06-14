@@ -2,7 +2,7 @@ import Layout from '../components/Layout';
 import ProfileCard from '../components/ProfileCard';
 import MatchCard from '../components/MatchCard';
 import { Heart } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 const Index = () => {
   const profiles = [
@@ -83,6 +83,16 @@ const Index = () => {
           >
             <span>Get Started</span>
             <Heart className="w-5 h-5" />
+          </Link>
+        </section>
+
+        {/* Link către feedul Calea Destinului */}
+        <section className="mb-10">
+          <Link
+            to="/destiny-feed"
+            className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-pink-500 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg hover:scale-105 transition-transform"
+          >
+            <span>Deschide Calea Destinului</span>
           </Link>
         </section>
 
