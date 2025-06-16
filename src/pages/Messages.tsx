@@ -1,5 +1,5 @@
 
-import { Search, MoreVertical, Send, Heart, ArrowLeft } from 'lucide-react';
+import { Search, MoreVertical, Send, Heart, ArrowLeft, MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 import Layout from '../components/Layout';
 
