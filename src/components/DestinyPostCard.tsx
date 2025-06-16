@@ -1,36 +1,18 @@
 
 import { useNavigate } from "react-router-dom";
-import { Star, Sun, Moon, Share2, MessageCircle, Heart } from "lucide-react";
+import { Star, Sun, Moon, Share2, Heart } from "lucide-react";
 import { DestinyPost } from "../types/destiny";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
-import { useDoubleTab } from "../hooks/useDoubleTab";
-import { useSwipeGestures } from "../hooks/useSwipeGestures";
-import { useState, useRef } from "react";
 
 interface DestinyPostCardProps {
   post: DestinyPost;
   onReact?: (type: "star" | "sun" | "moon") => void;
   onPostClick?: () => void;
-  onOpenComments?: () => void;
-  fontSize?: number;
-  onSwipeLeft?: () => void;
-  onSwipeRight?: () => void;
 }
 
-export default function DestinyPostCard({ 
-  post, 
-  onReact, 
-  onPostClick, 
-  onOpenComments,
-  fontSize = 16,
-  onSwipeLeft,
-  onSwipeRight
-}: DestinyPostCardProps) {
+export default function DestinyPostCard({ post, onReact, onPostClick }: DestinyPostCardProps) {
   const navigate = useNavigate();
-  const [showHeartAnimation, setShowHeartAnimation] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const imageRef = useRef<HTMLImageElement>(null);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -42,18 +24,8 @@ export default function DestinyPostCard({
     return `${Math.floor(diffInHours / 24)}z`;
   };
 
-  const handleDoubleTab = useDoubleTab(() => {
-    onReact?.("star");
-    setShowHeartAnimation(true);
-    setTimeout(() => setShowHeartAnimation(false), 1000);
-  });
-
-  const swipeRef = useSwipeGestures({
-    onSwipeLeft,
-    onSwipeRight,
-  });
-
   const handleCardClick = (e: React.MouseEvent) => {
+    // Prevent opening modal when clicking on interactive elements
     if ((e.target as HTMLElement).closest('button')) {
       return;
     }
@@ -65,25 +37,13 @@ export default function DestinyPostCard({
     navigate(`/destiny-profile/${post.author.id}`);
   };
 
-  const handleImageLoad = () => {
-    setImageLoaded(true);
-  };
-
   return (
     <Card 
-      ref={swipeRef}
       className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] relative overflow-hidden cursor-pointer"
       onClick={handleCardClick}
     >
       {/* Gradient de fundal subtil */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-50/30 to-pink-50/30 rounded-3xl"></div>
-      
-      {/* Heart Animation pentru double tap */}
-      {showHeartAnimation && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-          <Heart className="w-16 h-16 text-red-500 fill-current animate-scale-in" />
-        </div>
-      )}
       
       <div className="relative z-10">
         {/* Header cu avatar și info */}
@@ -110,36 +70,20 @@ export default function DestinyPostCard({
         </div>
 
         {/* Conținutul postării */}
-        <div 
-          className="mb-4 text-gray-800 leading-relaxed" 
-          style={{ fontSize: `${fontSize}px` }}
-          onDoubleClick={handleDoubleTab}
-        >
-          {post.content}
-        </div>
+        <div className="mb-4 text-gray-800 leading-relaxed">{post.content}</div>
 
-        {/* Media (imagine/video) cu lazy loading */}
+        {/* Media (imagine/video) */}
         {post.imageUrl && (
-          <div className="mb-4 rounded-2xl overflow-hidden shadow-lg relative" onDoubleClick={handleDoubleTab}>
-            {!imageLoaded && (
-              <div className="w-full h-80 bg-gray-200 animate-pulse rounded-2xl flex items-center justify-center">
-                <div className="text-gray-400">Se încarcă...</div>
-              </div>
-            )}
+          <div className="mb-4 rounded-2xl overflow-hidden shadow-lg">
             <img 
-              ref={imageRef}
               src={post.imageUrl} 
               alt="Post foto" 
-              className={`w-full max-h-80 object-cover hover:scale-105 transition-transform duration-300 ${
-                imageLoaded ? 'block' : 'hidden'
-              }`}
-              onLoad={handleImageLoad}
-              loading="lazy"
+              className="w-full max-h-80 object-cover hover:scale-105 transition-transform duration-300" 
             />
           </div>
         )}
         {post.videoUrl && (
-          <div className="mb-4 rounded-2xl overflow-hidden shadow-lg" onDoubleClick={handleDoubleTab}>
+          <div className="mb-4 rounded-2xl overflow-hidden shadow-lg">
             <video src={post.videoUrl} className="w-full" controls />
           </div>
         )}
@@ -184,19 +128,6 @@ export default function DestinyPostCard({
             >
               <Moon className="w-5 h-5 text-blue-500 fill-current" />
               <span className="text-sm font-medium">{post.reactions.find(x => x.type === "moon")?.count ?? 0}</span>
-            </Button>
-
-            <Button 
-              variant="ghost"
-              size="sm"
-              className="flex items-center gap-2 hover:bg-blue-50 hover:text-blue-600 rounded-full px-3 py-2 transition-all duration-200"
-              onClick={(e) => {
-                e.stopPropagation();
-                onOpenComments?.();
-              }}
-            >
-              <MessageCircle className="w-5 h-5 text-blue-500" />
-              <span className="text-sm font-medium">2</span>
             </Button>
           </div>
 

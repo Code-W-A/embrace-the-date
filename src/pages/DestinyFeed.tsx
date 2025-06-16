@@ -1,15 +1,11 @@
-import { useState, useEffect } from "react";
+
+import { useState } from "react";
 import Layout from "../components/Layout";
 import DestinyPostCard from "../components/DestinyPostCard";
 import DestinyPostModal from "../components/DestinyPostModal";
-import CommentsModal from "../components/CommentsModal";
-import NotificationsModal from "../components/NotificationsModal";
-import PersonalizationModal, { PersonalizationSettings } from "../components/PersonalizationModal";
-import SkeletonPost from "../components/SkeletonPost";
 import { DestinyPost, DestinyProfileUser } from "../types/destiny";
 import { Button } from "../components/ui/button";
-import { Sparkles, RefreshCw, Bell, Settings, ChevronDown } from "lucide-react";
-import { usePullToRefresh } from "../hooks/usePullToRefresh";
+import { Sparkles, RefreshCw } from "lucide-react";
 
 const PROMPTS = [
   "Ce emoție te domină azi?",
@@ -70,73 +66,14 @@ const dummyPosts: DestinyPost[] = [
 ];
 
 export default function DestinyFeed() {
-  const [posts, setPosts] = useState<DestinyPost[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [posts, setPosts] = useState<DestinyPost[]>(dummyPosts);
   const [prompt, setPrompt] = useState(PROMPTS[Math.floor(Math.random() * PROMPTS.length)]);
   const [content, setContent] = useState("");
   const [creating, setCreating] = useState(false);
   const [selectedPost, setSelectedPost] = useState<DestinyPost | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [commentsModalOpen, setCommentsModalOpen] = useState(false);
-  const [selectedPostForComments, setSelectedPostForComments] = useState<number | null>(null);
-  const [notificationsModalOpen, setNotificationsModalOpen] = useState(false);
-  const [personalizationModalOpen, setPersonalizationModalOpen] = useState(false);
-  const [currentPostIndex, setCurrentPostIndex] = useState(0);
-  const [newPostsCount, setNewPostsCount] = useState(0);
-  const [hasNewPosts, setHasNewPosts] = useState(false);
-
-  const [settings, setSettings] = useState<PersonalizationSettings>({
-    fontSize: 16,
-    darkMode: false,
-    showZodiacFilter: false,
-    preferredZodiacs: [],
-    autoRefresh: true,
-  });
 
   const currentUser = dummyUsers[0];
-
-  // Simulare încărcare inițială
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setPosts(dummyPosts);
-      setLoading(false);
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Auto refresh pentru postări noi
-  useEffect(() => {
-    if (!settings.autoRefresh) return;
-    
-    const interval = setInterval(() => {
-      // Simulare postări noi
-      const shouldAddNew = Math.random() > 0.8;
-      if (shouldAddNew) {
-        setNewPostsCount(prev => prev + 1);
-        setHasNewPosts(true);
-      }
-    }, 30000); // Check la fiecare 30 secunde
-
-    return () => clearInterval(interval);
-  }, [settings.autoRefresh]);
-
-  const refreshPosts = async () => {
-    setLoading(true);
-    // Simulare refresh
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setPosts([...dummyPosts]);
-    setNewPostsCount(0);
-    setHasNewPosts(false);
-    setLoading(false);
-  };
-
-  const {
-    isRefreshing,
-    pullDistance,
-    handleTouchStart,
-    handleTouchMove,
-    handleTouchEnd,
-  } = usePullToRefresh(refreshPosts);
 
   const handleCreatePost = () => {
     if (!content.trim()) return;
@@ -184,6 +121,7 @@ export default function DestinyFeed() {
   const handleModalReact = (type: "star" | "sun" | "moon") => {
     if (selectedPost) {
       handleReactToPost(selectedPost.id, type);
+      // Update the selected post with new reaction count
       setSelectedPost(prev => {
         if (!prev) return null;
         return {
@@ -196,100 +134,20 @@ export default function DestinyFeed() {
     }
   };
 
-  const handleOpenComments = (postId: number) => {
-    setSelectedPostForComments(postId);
-    setCommentsModalOpen(true);
-  };
-
-  const handleSwipeLeft = () => {
-    if (currentPostIndex < posts.length - 1) {
-      setCurrentPostIndex(prev => prev + 1);
-    }
-  };
-
-  const handleSwipeRight = () => {
-    if (currentPostIndex > 0) {
-      setCurrentPostIndex(prev => prev - 1);
-    }
-  };
-
-  const filteredPosts = settings.showZodiacFilter && settings.preferredZodiacs.length > 0
-    ? posts.filter(post => settings.preferredZodiacs.includes(post.author.zodiac))
-    : posts;
-
   return (
     <Layout>
-      <div 
-        className={`min-h-screen ${settings.darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50'}`}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-      >
-        {/* Pull to refresh indicator */}
-        {(pullDistance > 0 || isRefreshing) && (
-          <div 
-            className="fixed top-0 left-0 right-0 z-50 flex justify-center items-center bg-white/90 backdrop-blur-sm transition-all duration-300"
-            style={{ 
-              height: `${Math.max(pullDistance, isRefreshing ? 60 : 0)}px`,
-              transform: `translateY(${isRefreshing ? 0 : pullDistance - 60}px)`
-            }}
-          >
-            <div className="flex items-center space-x-2 text-purple-600">
-              <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
-              <span className="text-sm font-medium">
-                {isRefreshing ? 'Se actualizează...' : pullDistance > 60 ? 'Eliberează pentru actualizare' : 'Trage pentru actualizare'}
-              </span>
-            </div>
-          </div>
-        )}
-
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50">
         <div className="max-w-2xl mx-auto py-8 px-4">
           {/* Header cu gradient și animație */}
           <div className="text-center mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="text-4xl font-extrabold bg-gradient-to-r from-purple-600 via-pink-500 to-indigo-600 text-transparent bg-clip-text animate-fade-in">
-                ✨ Calea Destinului ✨
-              </h1>
-              <div className="flex items-center space-x-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="relative rounded-full"
-                  onClick={() => setNotificationsModalOpen(true)}
-                >
-                  <Bell className="w-5 h-5" />
-                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full text-xs"></span>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="rounded-full"
-                  onClick={() => setPersonalizationModalOpen(true)}
-                >
-                  <Settings className="w-5 h-5" />
-                </Button>
-              </div>
-            </div>
-            <p className={`${settings.darkMode ? 'text-gray-300' : 'text-gray-600'} font-medium`}>
-              Împărtășește-ți energia cu universul
-            </p>
+            <h1 className="text-4xl font-extrabold mb-2 bg-gradient-to-r from-purple-600 via-pink-500 to-indigo-600 text-transparent bg-clip-text animate-fade-in">
+              ✨ Calea Destinului ✨
+            </h1>
+            <p className="text-gray-600 font-medium">Împărtășește-ți energia cu universul</p>
           </div>
 
-          {/* Indicator postări noi */}
-          {hasNewPosts && (
-            <div className="mb-4">
-              <Button
-                onClick={refreshPosts}
-                className="w-full bg-purple-500 hover:bg-purple-600 text-white rounded-full py-3 flex items-center justify-center space-x-2"
-              >
-                <ChevronDown className="w-4 h-4" />
-                <span>{newPostsCount} postări noi</span>
-              </Button>
-            </div>
-          )}
-
           {/* Card pentru crearea postării cu design îmbunătățit */}
-          <div className={`${settings.darkMode ? 'bg-gray-800/80' : 'bg-white/80'} backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-6 mb-8 hover:shadow-2xl transition-all duration-300`}>
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-6 mb-8 hover:shadow-2xl transition-all duration-300">
             <div className="flex items-center mb-4">
               <img 
                 src={currentUser.avatar} 
@@ -339,34 +197,19 @@ export default function DestinyFeed() {
             </div>
           </div>
 
-          {/* Loading skeletons */}
-          {loading && (
-            <div className="space-y-6">
-              {[1, 2, 3].map((i) => (
-                <SkeletonPost key={i} />
-              ))}
-            </div>
-          )}
-
           {/* Lista de postări */}
-          {!loading && (
-            <div className="space-y-6">
-              {filteredPosts.map((post, index) => (
-                <DestinyPostCard 
-                  key={post.id} 
-                  post={post} 
-                  onReact={(t) => handleReactToPost(post.id, t)}
-                  onPostClick={() => handlePostClick(post)}
-                  onOpenComments={() => handleOpenComments(post.id)}
-                  fontSize={settings.fontSize}
-                  onSwipeLeft={index === currentPostIndex ? handleSwipeLeft : undefined}
-                  onSwipeRight={index === currentPostIndex ? handleSwipeRight : undefined}
-                />
-              ))}
-            </div>
-          )}
+          <div className="space-y-6">
+            {posts.map((post) => (
+              <DestinyPostCard 
+                key={post.id} 
+                post={post} 
+                onReact={(t) => handleReactToPost(post.id, t)}
+                onPostClick={() => handlePostClick(post)}
+              />
+            ))}
+          </div>
 
-          {/* Modaluri */}
+          {/* Modal pentru detaliile postării */}
           <DestinyPostModal
             post={selectedPost}
             open={modalOpen}
@@ -375,27 +218,6 @@ export default function DestinyFeed() {
               setSelectedPost(null);
             }}
             onReact={handleModalReact}
-          />
-
-          <CommentsModal
-            postId={selectedPostForComments || 0}
-            open={commentsModalOpen}
-            onClose={() => {
-              setCommentsModalOpen(false);
-              setSelectedPostForComments(null);
-            }}
-          />
-
-          <NotificationsModal
-            open={notificationsModalOpen}
-            onClose={() => setNotificationsModalOpen(false)}
-          />
-
-          <PersonalizationModal
-            open={personalizationModalOpen}
-            onClose={() => setPersonalizationModalOpen(false)}
-            settings={settings}
-            onSettingsChange={setSettings}
           />
         </div>
       </div>

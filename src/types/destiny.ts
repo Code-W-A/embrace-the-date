@@ -14,8 +14,6 @@ export interface DestinyPost {
   videoUrl?: string;
   reactions: DestinyReaction[];
   date: string;
-  commentsCount?: number;
-  isNew?: boolean;
 }
 
 export interface DestinyProfileUser {
@@ -25,5 +23,4 @@ export interface DestinyProfileUser {
   avatar: string;
   bio: string;
   following: boolean;
-  isOnline?: boolean;
 }
