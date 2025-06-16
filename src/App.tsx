@@ -10,6 +10,7 @@ import Messages from "./pages/Messages";
 import Discover from "./pages/Discover";
 import AstrologyQuiz from "./pages/AstrologyQuiz";
 import CompatibilityResults from "./pages/CompatibilityResults";
+import Registration from "./pages/Registration";
 import NotFound from "./pages/NotFound";
 import DestinyFeed from "./pages/DestinyFeed";
 import DestinyProfile from "./pages/DestinyProfile";
@@ -24,6 +25,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/register" element={<Registration />} />
           <Route path="/destiny-feed" element={<DestinyFeed />} />
           <Route path="/destiny-profile/:userId" element={<DestinyProfile />} />
           <Route path="/profile" element={<Profile />} />
